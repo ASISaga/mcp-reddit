@@ -1,15 +1,17 @@
 # MCP Reddit Server
 [![smithery badge](https://smithery.ai/badge/@adhikasp/mcp-reddit)](https://smithery.ai/server/@adhikasp/mcp-reddit)
 
-A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server that provides tools for fetching and analyzing Reddit content.
+A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) server that provides tools for fetching and analyzing Reddit content using Reddit's **official OAuth2 API** via [asyncpraw](https://asyncpraw.readthedocs.io/).
 
 <a href="https://glama.ai/mcp/servers/3cg9gdyors"><img width="380" height="200" src="https://glama.ai/mcp/servers/3cg9gdyors/badge" alt="mcp-reddit MCP server" /></a>
 
 ## Features
 
-- Fetch hot threads from any subreddit
-- Get detailed post content including comments
-- Support for different post types (text, link, gallery)
+- Fetch hot, new, top, and rising threads from any subreddit
+- Get detailed post content including full comment trees
+- Search Reddit posts across all subreddits or within a specific one
+- Retrieve subreddit metadata and user profile information
+- Fully authenticated via Reddit's official OAuth2 API (no scraping)
 
 ## Installation
 
@@ -27,10 +29,39 @@ npx -y @smithery/cli install @adhikasp/mcp-reddit --client claude
   "reddit": {
     "command": "uvx",
     "args": ["--from", "git+https://github.com/adhikasp/mcp-reddit.git", "mcp-reddit"],
-    "env": {}
+    "env": {
+      "REDDIT_CLIENT_ID": "<your_client_id>",
+      "REDDIT_CLIENT_SECRET": "<your_client_secret>",
+      "REDDIT_REFRESH_TOKEN": "<your_refresh_token>"
+    }
   }
 }
 ```
+
+## Authentication
+
+This server uses Reddit's official OAuth2 API. You need to [create a Reddit app](https://www.reddit.com/prefs/apps) and set the following environment variables:
+
+| Variable | Description |
+|---|---|
+| `REDDIT_CLIENT_ID` | OAuth2 client ID from your Reddit app |
+| `REDDIT_CLIENT_SECRET` | OAuth2 client secret from your Reddit app |
+| `REDDIT_REFRESH_TOKEN` | (Optional) Refresh token for authenticated access |
+
+Read-only operations work with just `REDDIT_CLIENT_ID` and `REDDIT_CLIENT_SECRET`.
+
+## Available Tools
+
+| Tool | Description |
+|---|---|
+| `fetch_reddit_hot_threads` | Fetch hot posts from a subreddit |
+| `fetch_reddit_new_threads` | Fetch newest posts from a subreddit |
+| `fetch_reddit_top_threads` | Fetch top posts from a subreddit (with time filter) |
+| `fetch_reddit_rising_threads` | Fetch rising posts from a subreddit |
+| `fetch_reddit_post_content` | Fetch a post's full content and comment tree |
+| `get_subreddit_info` | Retrieve metadata about a subreddit |
+| `get_user_profile` | Retrieve a Reddit user's public profile |
+| `search_reddit` | Search posts across Reddit or within a subreddit |
 
 ## Usage
 
@@ -42,7 +73,7 @@ $ llm what are latest hot thread in r/victoria3
 I'll fetch the latest hot threads from the Victoria 3 subreddit for you.
 
 Tool Calls:
-  fetch_hot_threads
+  fetch_reddit_hot_threads
   Args:
     subreddit: victoria3
 
@@ -70,4 +101,4 @@ Based on the hot threads, here are the key highlights from the Victoria 3 subred
 The most upvoted thread is the Dev Diary #126, which provides an in-depth look at the upcoming game mechanics improvements, particularly the reworks to political movements and discrimination systems.
 
 Would you like me to elaborate on any of these points or provide more details about the Victoria 3 update?
-``` 
+```
